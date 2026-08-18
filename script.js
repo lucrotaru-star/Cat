@@ -1,16 +1,13 @@
+const welcomeScreen = document.querySelector('#welcomeScreen');
+const playButton = document.querySelector('#playButton');
+const terminal = document.querySelector('#terminal');
 const bootLines = document.querySelector('#bootLines');
 const codeOutput = document.querySelector('#codeOutput');
 const counter = document.querySelector('#counter');
 const hint = document.querySelector('#hint');
 const modal = document.querySelector('#accessModal');
-const restartButton = document.querySelector('#restartButton');
 const clock = document.querySelector('#clock');
-
-const target = 80;
-let inputCount = 0;
-let lineIndex = 0;
-let unlocked = false;
-let isTyping = false;
+const fakeWindows = document.querySelector('#fakeWindows');
 
 const bootLog = [
   'ИНИЦИАЛИЗАЦИЯ ЗАЩИЩЁННОГО КАНАЛА...',
@@ -18,9 +15,8 @@ const bootLog = [
   'ОБХОД ПРОТОКОЛА FIREWALL <span class="muted">[BYPASSED]</span>',
   'ОПРЕДЕЛЕНИЕ ГЕОЛОКАЦИИ <span class="muted">[47.3769° N, 8.5417° E]</span>',
   'СПУТНИКОВЫЙ КАНАЛ: УСТАНОВЛЕН <span class="muted">[ENCRYPTED]</span>',
-  'ОЖИДАНИЕ РУЧНОГО ВВОДА...'
+  'АВТОНОМНЫЙ ПОТОК ДАННЫХ ЗАПУЩЕН...'
 ];
-
 const snippets = [
   'const tunnel = await QuantumLink.open({ mode: "silent", relay: node });',
   'function decryptPacket(buffer) { return AES.decode(buffer, sessionKey); }',
@@ -29,13 +25,22 @@ const snippets = [
   'if (trace.level > 0) { reroute(proxyChain.rotate()); }',
   'await vault.sync({ compression: "adaptive", priority: "critical" });',
   'kernel.inject("/dev/ghost", { privilege: "root", timeout: 0 });',
-  'const checksum = packets.reduce((sum, p) => sum ^ p.hash, 0xA7);',
-  'neuralMap.resolve(origin).then(access => session.authorize(access));',
-  'while (uplink.signal > 0.92) { exfiltrate(fragment.next()); }'
+  'const checksum = packets.reduce((sum, p) => sum ^ p.hash, 0xA7);'
 ];
 
+let progress = 0;
+let lineIndex = 0;
+
+function updateClock() {
+  clock.textContent = new Date().toLocaleTimeString('ru-RU', { hour12: false });
+}
+
+function updateProgress() {
+  counter.textContent = `DATA: ${String(progress).padStart(3, '0')} / 100`;
+}
+
 function addBootLine(text, delay) {
-  window.setTimeout(() => {
+  setTimeout(() => {
     const line = document.createElement('div');
     line.className = 'log-line';
     line.innerHTML = text;
@@ -43,62 +48,66 @@ function addBootLine(text, delay) {
   }, delay);
 }
 
-function startBoot() {
-  bootLines.innerHTML = '';
-  bootLog.forEach((line, index) => addBootLine(line, index * 330));
-}
-
-function updateClock() {
-  clock.textContent = new Date().toLocaleTimeString('ru-RU', { hour12: false });
-}
-
-function updateCounter() {
-  counter.textContent = `INPUT: ${String(Math.min(inputCount, target)).padStart(3, '0')} / ${String(target).padStart(3, '0')}`;
-}
-
-function typeSnippet() {
-  if (isTyping || unlocked) return;
-  isTyping = true;
-  hint.textContent = ' Обработка командного потока...';
+function writeSnippet() {
   const text = snippets[lineIndex++ % snippets.length];
   const line = document.createElement('div');
   line.className = 'code-line';
   codeOutput.append(line);
   let char = 0;
-  const writer = window.setInterval(() => {
+  const writer = setInterval(() => {
     line.textContent += text[char++] || '';
-    document.querySelector('.console').scrollTop = document.querySelector('.console').scrollHeight;
-    if (char >= text.length) {
-      window.clearInterval(writer);
-      isTyping = false;
-      hint.textContent = ' Нажмите любую клавишу или коснитесь экрана';
-    }
-  }, 9);
+    if (char >= text.length) clearInterval(writer);
+  }, 8);
 }
 
-function registerInput(forceFinish = false) {
-  if (unlocked) return;
-  inputCount += forceFinish ? target : 1;
-  updateCounter();
-  typeSnippet();
-  if (inputCount >= target || forceFinish) unlock();
+function showWindows() {
+  const messages = [
+    'WARNING: REMOTE SESSION DETECTED',
+    'SYSTEM FILES: ARCHIVE CREATED',
+    'ENCRYPTION KEY: OVERRIDDEN',
+    'CONNECTION STATUS: UNSTABLE'
+  ];
+  messages.forEach((message, index) => setTimeout(() => {
+    const win = document.createElement('article');
+    win.className = 'fake-window';
+    win.style.left = `${8 + (index * 19) % 48}%`;
+    win.style.top = `${8 + (index * 16) % 58}%`;
+    win.innerHTML = `<header><span>SECURITY_ALERT.exe</span><span>×</span></header><p><span class="warning">${message}</span><br>> scanning residual processes...<br>> access level: ROOT</p>`;
+    fakeWindows.append(win);
+  }, index * 550));
 }
 
-function unlock() {
-  unlocked = true;
+function finishSequence() {
+  hint.textContent = ' Данные приняты. Инициализация предупреждений...';
   modal.classList.add('show');
   modal.setAttribute('aria-hidden', 'false');
+  setTimeout(showWindows, 1200);
 }
 
-document.addEventListener('keydown', (event) => {
-  if (event.key === 'Enter') registerInput(true);
-  else registerInput();
-});
-document.querySelector('#terminal').addEventListener('pointerdown', () => registerInput());
-restartButton.addEventListener('click', () => {
-  unlocked = false; inputCount = 0; lineIndex = 0; isTyping = false;
-  codeOutput.innerHTML = ''; updateCounter(); startBoot();
-  modal.classList.remove('show'); modal.setAttribute('aria-hidden', 'true');
+function startSequence() {
+  bootLog.forEach((line, index) => addBootLine(line, index * 300));
+  const stream = setInterval(() => {
+    writeSnippet();
+    progress = Math.min(100, progress + 8);
+    updateProgress();
+    if (progress >= 100) {
+      clearInterval(stream);
+      setTimeout(finishSequence, 950);
+    }
+  }, 600);
+}
+
+playButton.addEventListener('click', async () => {
+  try {
+    await document.documentElement.requestFullscreen?.();
+  } catch (_) {
+    // Browsers may decline fullscreen; the scene still works normally.
+  }
+  welcomeScreen.hidden = true;
+  terminal.hidden = false;
+  updateClock();
+  updateProgress();
+  startSequence();
 });
 
-updateCounter(); updateClock(); startBoot(); window.setInterval(updateClock, 1000);
+setInterval(updateClock, 1000);

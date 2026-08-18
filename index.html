@@ -8,7 +8,19 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <main class="terminal" id="terminal" aria-label="Интерактивный терминал">
+    <section class="welcome-screen" id="welcomeScreen">
+      <div class="welcome-sparkles" aria-hidden="true">✦　♡　✧　♡　✦</div>
+      <div class="welcome-card">
+        <div class="cat" aria-hidden="true">ฅ^•ﻌ•^ฅ</div>
+        <p class="welcome-kicker">МАЛЕНЬКИЙ СЮРПРИЗ</p>
+        <h1>Котик хочет<br />поиграть ✿</h1>
+        <p>Нажми кнопку — он приготовил<br />для тебя кое-что интересное.</p>
+        <button class="play-button" id="playButton" type="button">ИГРАТЬ <span>♡</span></button>
+      </div>
+      <p class="welcome-footer">made with tiny paws</p>
+    </section>
+
+    <main class="terminal" id="terminal" aria-label="Кинематографическая симуляция терминала" hidden>
       <div class="crt-overlay" aria-hidden="true"></div>
       <header class="terminal-header">
         <span class="status-dot"></span>
@@ -20,12 +32,12 @@
         <div class="boot-lines" id="bootLines"></div>
         <div class="divider"></div>
         <div class="code-output" id="codeOutput"></div>
-        <p class="prompt" id="prompt"><span class="caret">▋</span><span id="hint"> Нажмите любую клавишу или коснитесь экрана</span></p>
+        <p class="prompt" id="prompt"><span class="caret">▋</span><span id="hint"> Автономный поток активен...</span></p>
       </section>
 
       <footer class="terminal-footer">
         <span>UPLINK: ENCRYPTED</span>
-        <span id="counter">INPUT: 000 / 080</span>
+        <span id="counter">DATA: 000 / 100</span>
       </footer>
 
       <section class="access-modal" id="accessModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="accessTitle">
@@ -34,11 +46,11 @@
           <div class="danger-mark">!</div>
           <p class="access-label">ROOT_PRIVILEGES_GRANTED</p>
           <h1 id="accessTitle">ДОСТУП ПОЛУЧЕН</h1>
-          <p>ВСЕ ДАННЫЕ СКАЧАНЫ</p>
+          <p>ДАННЫЕ ПОЛУЧЕНЫ</p>
           <div class="download-bar"><span></span></div>
-          <button type="button" id="restartButton">ЗАПУСТИТЬ НОВЫЙ СЕАНС</button>
         </div>
       </section>
+      <section class="fake-windows" id="fakeWindows" aria-label="Декоративные окна терминала"></section>
     </main>
     <script src="script.js"></script>
   </body>
