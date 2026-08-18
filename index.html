@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#020503" />
+    <title>Сайт-Хакер</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="terminal" id="terminal" aria-label="Интерактивный терминал">
+      <div class="crt-overlay" aria-hidden="true"></div>
+      <header class="terminal-header">
+        <span class="status-dot"></span>
+        <span>SECURE_TERMINAL // LIVE_SESSION</span>
+        <span class="clock" id="clock">00:00:00</span>
+      </header>
+
+      <section class="console" id="console" aria-live="polite">
+        <div class="boot-lines" id="bootLines"></div>
+        <div class="divider"></div>
+        <div class="code-output" id="codeOutput"></div>
+        <p class="prompt" id="prompt"><span class="caret">▋</span><span id="hint"> Нажмите любую клавишу или коснитесь экрана</span></p>
+      </section>
+
+      <footer class="terminal-footer">
+        <span>UPLINK: ENCRYPTED</span>
+        <span id="counter">INPUT: 000 / 080</span>
+      </footer>
+
+      <section class="access-modal" id="accessModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="accessTitle">
+        <div class="modal-glitch" aria-hidden="true"></div>
+        <div class="access-card">
+          <div class="danger-mark">!</div>
+          <p class="access-label">ROOT_PRIVILEGES_GRANTED</p>
+          <h1 id="accessTitle">ДОСТУП ПОЛУЧЕН</h1>
+          <p>ВСЕ ДАННЫЕ СКАЧАНЫ</p>
+          <div class="download-bar"><span></span></div>
+          <button type="button" id="restartButton">ЗАПУСТИТЬ НОВЫЙ СЕАНС</button>
+        </div>
+      </section>
+    </main>
+    <script src="script.js"></script>
+  </body>
+</html>
