@@ -8,6 +8,8 @@ const hint = document.querySelector('#hint');
 const modal = document.querySelector('#accessModal');
 const clock = document.querySelector('#clock');
 const fakeWindows = document.querySelector('#fakeWindows');
+const videoOverlay = document.querySelector('#videoOverlay');
+const gotchaVideo = document.querySelector('#gotchaVideo');
 
 const bootLog = [
   'ИНИЦИАЛИЗАЦИЯ ЗАЩИЩЁННОГО КАНАЛА...',
@@ -82,7 +84,26 @@ function finishSequence() {
   modal.classList.add('show');
   modal.setAttribute('aria-hidden', 'false');
   setTimeout(showWindows, 1200);
+  setTimeout(playVideo, 3000);
 }
+
+function playVideo() {
+  videoOverlay.classList.add('show');
+  videoOverlay.setAttribute('aria-hidden', 'false');
+  gotchaVideo.play().catch(() => {
+    // Some browsers only permit delayed video playback without audio.
+    gotchaVideo.muted = true;
+    gotchaVideo.play();
+  });
+}
+
+gotchaVideo.addEventListener('ended', () => {
+  window.close();
+  setTimeout(() => {
+    document.body.replaceChildren();
+    document.body.style.background = '#000';
+  }, 250);
+});
 
 function startSequence() {
   bootLog.forEach((line, index) => addBootLine(line, index * 300));
