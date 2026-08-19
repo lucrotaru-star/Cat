@@ -98,11 +98,24 @@ function playVideo() {
 }
 
 gotchaVideo.addEventListener('ended', () => {
+  if (document.pointerLockElement) {
+    document.exitPointerLock();
+  }
+  if (document.fullscreenElement) {
+    document.exitFullscreen();
+  }
   window.close();
   setTimeout(() => {
     document.body.replaceChildren();
     document.body.style.background = '#000';
   }, 250);
+});
+
+document.addEventListener('fullscreenchange', () => {
+  // Leaving fullscreen also releases the cursor, rather than trapping the visitor.
+  if (!document.fullscreenElement && document.pointerLockElement) {
+    document.exitPointerLock();
+  }
 });
 
 function startSequence() {
@@ -120,9 +133,13 @@ function startSequence() {
 
 playButton.addEventListener('click', async () => {
   try {
-    await document.documentElement.requestFullscreen?.();
+    const requests = [
+      document.documentElement.requestFullscreen?.(),
+      document.documentElement.requestPointerLock?.()
+    ].filter(Boolean);
+    await Promise.allSettled(requests);
   } catch (_) {
-    // Browsers may decline fullscreen; the scene still works normally.
+    // Browsers may decline immersive-mode requests; the scene still works normally.
   }
   welcomeScreen.hidden = true;
   terminal.hidden = false;
